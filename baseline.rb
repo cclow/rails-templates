@@ -30,6 +30,10 @@ run 'rm public/index.html'
 run 'rm public/favicon.ico'
 run 'rm public/robots.txt'
 
+if yes?("Use jQuery?")
+  load_template( 'http://github.com/cclow/rails-templates/raw/master/use_jquery.rb')
+end
+
 run "cp config/database.yml config/example_database.yml"
 run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
 
@@ -42,6 +46,7 @@ gem 'mocha'
 
 gem "sqlite3-ruby", :lib => "sqlite3"
 gem 'authlogic'
+gem 'mislav-will_paginate', :lib => 'will_paginate'
 
 git :add => '.'
 git :commit => '-m "Initial commit"'
