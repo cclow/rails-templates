@@ -39,14 +39,32 @@ run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
 
 # gem 'cucumber'
 # gem 'webrat'
-gem 'thoughtbot-factory_girl', :lib => 'factory_girl'
-gem 'thoughtbot-shoulda', :lib => 'shoulda'
-gem 'faker'
-gem 'mocha'
 
-gem "sqlite3-ruby", :lib => "sqlite3"
+inside('config/environments') do
+  run "cat >> test.rb <<-END
+
+# gems for testing
+config.gem 'sqlite3-ruby', :lib => 'sqlite3'
+config.gem 'mocha'
+config.gem 'faker'
+config.gem 'thoughtbot-shoulda', :lib => 'shoulda'
+config.gem 'thoughtbot-factory_girl', :lib => 'factory_girl'
+END"
+end
+
+# gem 'thoughtbot-factory_girl', :lib => 'factory_girl'
+# gem 'thoughtbot-shoulda', :lib => 'shoulda'
+# gem 'faker'
+# gem 'mocha'
+# 
+# gem "sqlite3-ruby", :lib => "sqlite3"
 gem 'authlogic'
 gem 'mislav-will_paginate', :lib => 'will_paginate'
+
+if yes?("Use Haml?")
+  gem 'haml'
+  run 'haml --rails .'
+end
 
 git :add => '.'
 git :commit => '-m "Initial commit"'
