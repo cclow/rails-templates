@@ -44,7 +44,6 @@ inside('config/environments') do
   run "cat >> test.rb <<-END
 
 # gems for testing
-config.gem 'sqlite3-ruby', :lib => 'sqlite3'
 config.gem 'mocha'
 config.gem 'faker'
 config.gem 'thoughtbot-shoulda', :lib => 'shoulda'
@@ -57,7 +56,7 @@ end
 # gem 'faker'
 # gem 'mocha'
 # 
-# gem "sqlite3-ruby", :lib => "sqlite3"
+gem "sqlite3-ruby", :lib => "sqlite3"
 gem 'authlogic'
 gem 'mislav-will_paginate', :lib => 'will_paginate'
 
