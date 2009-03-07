@@ -62,7 +62,7 @@ gem "dbd-sqlite3",
 gem "authlogic",
   :version => ">=1.4.3"
 gem 'mislav-will_paginate',
-  :lib => 'will_paginate'
+  :lib => 'will_paginate',
   :source => "http://gems.github.com",
   :version => ">=2.3.7"
 
