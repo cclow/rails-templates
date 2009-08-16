@@ -34,37 +34,56 @@ run 'rm public/robots.txt'
 run "cp config/database.yml config/example_database.yml"
 run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
 
-inside("config/environments") do
-  run 'cat >> test.rb <<-END_TEST_GEMS
-config.gem "cucumber",
-  :version => ">=0.1.16"
-config.gem "webrat",
-  :version => ">=0.4.2"
-config.gem "mocha",
-  :version => ">=0.9.5"
-config.gem "faker",
-  :version => ">=0.3.1"
-config.gem "thoughtbot-shoulda",
-  :lib => "shoulda",
-  :source => "http://gems.github.com",
-  :version => ">=2.10.0"
-config.gem "thoughtbot-factory_girl",
-  :lib => "factory_girl",
-  :source => "http://gems.github.com",
-  :version => ">=1.2.0"
-END_TEST_GEMS'
-end
 # 
 gem "dbd-sqlite3",
   :lib => "sqlite3",
-  :source => "http://gems.github.com",
-  :version => ">=1.2.4"
-gem "authlogic",
-  :version => ">=1.4.3"
+  :source => "http://gems.github.com"
+gem "authlogic"
 gem 'mislav-will_paginate',
   :lib => 'will_paginate',
-  :source => "http://gems.github.com",
-  :version => ">=2.3.7"
+  :source => "http://gems.github.com"
+
+gem 'cucumber',
+  :lib => false
+gem 'webrat',
+  :lib => false
+gem "faker",
+  :lib => false
+gem "thoughtbot-shoulda",
+  :lib => false,
+  :source => "http://gems.github.com"
+gem "notahat-machinist",
+  :lib => false,
+  :source => "http://gems.github.com"
+
+# add default home page
+generate(:controller, "home", "index")
+route 'map.root :controller => "home"'
+
+# setup testing
+generate(:cucumber, "--testunit")
+
+file "test/blueprints.rb", <<-BLUEPRINTS
+require "machinist/active_record"
+require "sham"
+require "faker"
+
+BLUEPRINTS
+
+run <<-TEST_HELPER_RUN
+cat >> test/test_helper.rb <<-TEST_HELPER
+
+require "shoulda"
+require File.expand_path(File.dirname(__FILE__) + "/blueprints")
+TEST_HELPER
+TEST_HELPER_RUN
+
+run <<-ENV_RUN
+cat >> features/support/env.rb <<-ENV
+
+require File.expand_path(File.dirname(__FILE__) + '/../../test/blueprints')
+ENV
+ENV_RUN
 
 git :add => '.'
-git :commit => '-m "Initial commit"'
+git :commit => '-m "Initial commit with baseline template"'
