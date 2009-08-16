@@ -56,7 +56,8 @@ gem "notahat-machinist",
   :lib => false,
   :source => "http://gems.github.com"
 
-# add default home page
+# add default layout and home page
+generate(:nifty_layout)
 generate(:controller, "home", "index")
 route 'map.root :controller => "home"'
 
@@ -86,4 +87,4 @@ ENV
 ENV_RUN
 
 git :add => '.'
-git :commit => '-m "Initial commit with baseline template"'
+git :commit => '-m "Rails app with baseline template"'
