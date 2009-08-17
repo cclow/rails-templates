@@ -31,7 +31,7 @@ run 'rm public/index.html'
 run 'rm public/favicon.ico'
 run 'rm public/robots.txt'
 
-run "cp config/database.yml config/example_database.yml"
+run "cp config/database.yml config/database_sample.yml"
 run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
 
 # 
@@ -63,12 +63,18 @@ route 'map.root :controller => "home"'
 
 # setup testing
 generate(:cucumber, "--testunit")
+file "cucumber.yml", <<-CUCUMBER_YML
+default: -r features/support -r features/step_definitions
+CUCUMBER_YML
+
+run "mkdir test/blueprints"
 
 file "test/blueprints.rb", <<-BLUEPRINTS
 require "machinist/active_record"
 require "sham"
 require "faker"
 
+Dir.glob(File.join(File.dirname(__FILE__), "/blueprints/*.rb")).each { |f| require f }
 BLUEPRINTS
 
 run <<-TEST_HELPER_RUN
