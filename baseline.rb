@@ -31,9 +31,6 @@ run 'rm public/index.html'
 run 'rm public/favicon.ico'
 run 'rm public/robots.txt'
 
-run "cp config/database.yml config/database_sample.yml"
-run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
-
 # 
 gem "dbd-sqlite3",
   :lib => "sqlite3",
@@ -225,6 +222,9 @@ cat >> features/support/env.rb <<-ENV
 require File.expand_path(File.dirname(__FILE__) + '/../../test/blueprints')
 ENV
 ENV_RUN
+
+run "cp config/database.yml config/database_sample.yml"
+run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
 
 git :add => '.'
 git :commit => '-m "Rails app with baseline template"'
