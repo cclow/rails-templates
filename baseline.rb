@@ -196,7 +196,7 @@ file "cucumber.yml", <<-CUCUMBER_YML
 default: -r features/support -r features/step_definitions
 CUCUMBER_YML
 
-run "mkdir test/blueprints"
+run "mkdir -p test/blueprints"
 
 file "test/blueprints.rb", <<-BLUEPRINTS
 require "machinist/active_record"
@@ -211,6 +211,11 @@ cat >> test/test_helper.rb <<-TEST_HELPER
 
 require "shoulda"
 require File.expand_path(File.dirname(__FILE__) + "/blueprints")
+require "authlogic/test_case"
+
+class ActionController::TestCase
+  setup :activate_authlogic
+end
 TEST_HELPER
 TEST_HELPER_RUN
 
