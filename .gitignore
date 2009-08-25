@@ -1,0 +1,8 @@
+.DS_Store
+TAGS
+*~
+.#*
+.hgignore
+.hg/*
+.svn/*
+*.swp

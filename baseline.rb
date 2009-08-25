@@ -23,6 +23,7 @@ config/database.yml
 doc/api
 doc/app
 coverage/*
+*.swp
 GITIGNORE
 
 run 'rm README'
@@ -30,27 +31,23 @@ run 'rm doc/README_FOR_APP'
 run 'rm public/index.html'
 run 'rm public/favicon.ico'
 run 'rm public/robots.txt'
+run 'rm public/images/rails.png'
 
-# 
-gem "dbd-sqlite3",
-  :lib => "sqlite3",
+#
+gem "dbd-sqlite3", :lib => "sqlite3",
   :source => "http://gems.github.com"
 gem "authlogic"
-gem 'mislav-will_paginate',
-  :lib => 'will_paginate',
+gem 'mislav-will_paginate', :lib => 'will_paginate',
+  :source => "http://gems.github.com"
+gem 'justinfrench-formtastic', :lib => 'formtastic',
   :source => "http://gems.github.com"
 
-gem 'cucumber',
-  :lib => false
-gem 'webrat',
-  :lib => false
-gem "faker",
-  :lib => false
-gem "thoughtbot-shoulda",
-  :lib => false,
+gem 'cucumber', :lib => false
+gem 'webrat', :lib => false
+gem "faker", :lib => false
+gem "thoughtbot-shoulda", :lib => false,
   :source => "http://gems.github.com"
-gem "notahat-machinist",
-  :lib => false,
+gem "notahat-machinist", :lib => false,
   :source => "http://gems.github.com"
 
 # add default layout and home page
@@ -80,7 +77,7 @@ file "app/views/layouts/application.html.erb", <<-APPLICATION_HTML
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title><%%= h(yield(:title) || "Untitled") %></title>
+    <title><%= h(yield(:title) || "Untitled") %></title>
     <%= stylesheet_link_tag 'application' %>
     <%= yield(:head) %>
   </head>
@@ -190,7 +187,9 @@ route 'map.root :controller => "home"'
 # setup testing
 generate(:cucumber, "--testunit")
 file "cucumber.yml", <<-CUCUMBER_YML
-default: -r features/support -r features/step_definitions
+default: -r features -v
+autotest: -r features
+autotest-all: features -r features
 CUCUMBER_YML
 
 run "mkdir -p test/blueprints"
