@@ -41,6 +41,7 @@ gem 'mislav-will_paginate', :lib => 'will_paginate',
   :source => "http://gems.github.com"
 gem 'justinfrench-formtastic', :lib => 'formtastic',
   :source => "http://gems.github.com"
+gem 'haml'
 
 gem 'cucumber', :lib => false
 gem 'webrat', :lib => false
@@ -72,29 +73,20 @@ module LayoutHelper
 end
 LAYOUT_HELPER
 
-file "app/views/layouts/application.html.erb", <<-APPLICATION_HTML
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-  <head>
-    <title><%= h(yield(:title) || "Untitled") %></title>
-    <%= stylesheet_link_tag 'application' %>
-    <%= yield(:head) %>
-  </head>
-  <body>
-    <div id="container">
-      <%- flash.each do |name, msg| -%>
-        <%= content_tag :div, msg, :id => "flash_\#{name}" %>
-      <%- end -%>
-
-      <%- if show_title? -%>
-        <h1><%=h yield(:title) %></h1>
-      <%- end -%>
-
-      <%= yield %>
-    </div>
-  </body>
-</html>
+file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
+!!!
+%html
+  %head
+    %title= h(yield(:title) || "Untitled")
+    = stylesheet_link_tag 'application'
+    = yield(:head)
+  %body
+    #container
+      - flash.each do |name, msg|
+        = content_tag :div, msg, :id => "flash_\#{name}"
+      - if show_title?
+        %h1=h yield(:title)
+      = yield
 APPLICATION_HTML
 
 file "public/stylesheets/application.css", <<-APPLICATION_CSS
