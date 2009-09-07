@@ -34,8 +34,7 @@ run 'rm public/robots.txt'
 run 'rm public/images/rails.png'
 
 #
-gem "dbd-sqlite3", :lib => "sqlite3",
-  :source => "http://gems.github.com"
+gem "dbd-sqlite3", :lib => "sqlite3"
 gem "authlogic"
 gem 'mislav-will_paginate', :lib => 'will_paginate',
   :source => "http://gems.github.com"
