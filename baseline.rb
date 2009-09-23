@@ -1,3 +1,5 @@
+blueprintcss = "/Users/cclow/Code/Ufinity/blueprint-css/blueprint"
+
 git :init
 file '.gitignore', <<-GITIGNORE
 .DS_Store
@@ -29,7 +31,6 @@ GITIGNORE
 run 'rm README'
 run 'rm doc/README_FOR_APP'
 run 'rm public/index.html'
-run 'rm public/favicon.ico'
 run 'rm public/robots.txt'
 run 'rm public/images/rails.png'
 
@@ -49,6 +50,13 @@ gem "thoughtbot-shoulda", :lib => false,
   :source => "http://gems.github.com"
 gem "notahat-machinist", :lib => false,
   :source => "http://gems.github.com"
+
+run "mkdir -p public/stylesheets/blueprint"
+inside("public/stylesheets/blueprint") do
+  ["ie.css", "screen.css", "print.css"].each do |f|
+    run "cp #{blueprintcss}/#{f} ."
+  end
+end
 
 # add default layout and home page
 file "app/helpers/layout_helper.rb", <<-LAYOUT_HELPER
@@ -77,121 +85,61 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
 %html
   %head
     %title= h(yield(:title) || "Untitled")
+    = stylesheet_link_tag "blueprint/screen", :media => "screen, projection"
+    = stylesheet_link_tag "blueprint/print", :media => "print"
+    <!--[if lt IE 8]>
+    = stylesheet_link_tag "blueprint/ie", :media => "screen, projection"
+    <![endif]-->
     = stylesheet_link_tag 'application'
     = yield(:head)
   %body
     #container
-      - flash.each do |name, msg|
-        = content_tag :div, msg, :id => "flash_\#{name}"
       - if show_title?
-        %h1=h yield(:title)
-      = yield
+        #header.span-24.last
+          %h1.span-24.last=h yield(:title)
+      #main.span-15.colborder
+        = yield
+      #sidebar.span-8.last
+        - flash.each do |name, msg|
+          = content_tag :div, msg, :class => "\#{name} last"
 APPLICATION_HTML
 
 file "public/stylesheets/application.css", <<-APPLICATION_CSS
-body {
-  background-color: #4B7399;
-  font-family: Verdana, Helvetica, Arial;
-  font-size: 14px;
-}
-
-a img {
-  border: none;
-}
-
-a {
-  color: #0000FF;
-}
-
-.clear {
-  clear: both;
-  height: 0;
-  overflow: hidden;
-}
-
 #container {
-  width: 75%;
-  margin: 0 auto;
-  background-color: #FFF;
-  padding: 20px 40px;
-  border: solid 1px black;
-  margin-top: 20px;
-}
-
-#flash_notice, #flash_error {
-  padding: 5px 8px;
-  margin: 10px 0;
-}
-
-#flash_notice {
-  background-color: #CFC;
-  border: solid 1px #6C6;
-}
-
-#flash_error {
-  background-color: #FCC;
-  border: solid 1px #C66;
-}
-
-.fieldWithErrors {
-  display: inline;
-}
-
-#errorExplanation {
-  width: 400px;
-  border: 2px solid #CF0000;
-  padding: 0px;
-  padding-bottom: 12px;
-  margin-bottom: 20px;
-  background-color: #f0f0f0;
-}
-
-#errorExplanation h2 {
-  text-align: left;
-  font-weight: bold;
-  padding: 5px 5px 5px 15px;
-  font-size: 12px;
-  margin: 0;
-  background-color: #c00;
-  color: #fff;
-}
-
-#errorExplanation p {
-  color: #333;
-  margin-bottom: 0;
-  padding: 8px;
-}
-
-#errorExplanation ul {
-  margin: 2px 24px;
-}
-
-#errorExplanation ul li {
-  font-size: 12px;
-  list-style: disc;
+  width: 960px;
+  margin: 20px auto 0;
 }
 APPLICATION_CSS
 
 generate(:controller, "home", "index")
 route 'map.root :controller => "home"'
+run "rm app/views/home/index.html.erb"
+file "app/views/home/index.html.haml", <<-INDEX_HTML
+- title "Home Page"
+<p>Et vel ut et aspernatur commodi sequi labore.
+Voluptatem ullam at error possimus ut rerum ut.
+Sunt illo fuga sed nemo.
+Dolorum rerum quia commodi aut iure dolorem cum.
+Accusantium eos perspiciatis voluptatibus ipsum.</p>
+INDEX_HTML
 
 # setup testing
 generate(:cucumber, "--testunit")
 file "cucumber.yml", <<-CUCUMBER_YML
 default: -r features -v
 autotest: -r features
-autotest-all: features -r features
+autotest-all: features -r features -f progress
 CUCUMBER_YML
 
-run "mkdir -p test/blueprints"
+run "mkdir -p test/machinist"
 
-file "test/blueprints.rb", <<-BLUEPRINTS
+file "test/machinist.rb", <<-MACHINIST
 require "machinist/active_record"
 require "sham"
 require "faker"
 
-Dir.glob(File.join(File.dirname(__FILE__), "/blueprints/*.rb")).each { |f| require f }
-BLUEPRINTS
+Dir.glob(File.join(File.dirname(__FILE__), "/machinist/*.rb")).each { |f| require f }
+MACHINIST
 
 run <<-TEST_HELPER_RUN
 cat >> test/test_helper.rb <<-TEST_HELPER
@@ -209,12 +157,12 @@ TEST_HELPER_RUN
 run <<-ENV_RUN
 cat >> features/support/env.rb <<-ENV
 
-require File.expand_path(File.dirname(__FILE__) + '/../../test/blueprints')
+require File.expand_path(File.dirname(__FILE__) + "/../../test/machinist")
 ENV
 ENV_RUN
 
 run "cp config/database.yml config/database_sample.yml"
 run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
 
-git :add => '.'
+git :add => "."
 git :commit => '-m "Rails app with baseline template"'
