@@ -145,7 +145,7 @@ run <<-TEST_HELPER_RUN
 cat >> test/test_helper.rb <<-TEST_HELPER
 
 require "shoulda"
-require File.expand_path(File.dirname(__FILE__) + "/blueprints")
+require File.expand_path(File.dirname(__FILE__) + "/machinist")
 require "authlogic/test_case"
 
 class ActionController::TestCase
