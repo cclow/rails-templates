@@ -26,6 +26,7 @@ doc/api
 doc/app
 coverage/*
 *.swp
+public/stylesheets/compiled/*
 GITIGNORE
 
 run 'rm README'
@@ -42,6 +43,8 @@ gem 'mislav-will_paginate', :lib => 'will_paginate',
 gem 'justinfrench-formtastic', :lib => 'formtastic',
   :source => "http://gems.github.com"
 gem 'haml'
+gem "chriseppstein-compass", :lib => "compass",
+  :source => "http://gems.github.com"
 
 gem 'cucumber', :lib => false
 gem 'webrat', :lib => false
@@ -51,12 +54,16 @@ gem "thoughtbot-shoulda", :lib => false,
 gem "notahat-machinist", :lib => false,
   :source => "http://gems.github.com"
 
-run "mkdir -p public/stylesheets/blueprint"
-inside("public/stylesheets/blueprint") do
-  ["ie.css", "screen.css", "print.css"].each do |f|
-    run "cp #{blueprintcss}/#{f} ."
-  end
-end
+rake "gems:install", :sudo => true
+rake "gems:unpack GEM=chriseppstein-compass"
+
+file 'vendor/plugins/compass/init.rb', <<-CODE
+# This is here to make sure that the right version of sass gets loaded (haml 2.2) by the compass requires.
+require 'compass'
+CODE
+
+run "haml --rails ."
+run "compass --rails -f blueprint . --css-dir=public/stylesheets/compiled --sass-dir=app/stylesheets"
 
 # add default layout and home page
 file "app/helpers/layout_helper.rb", <<-LAYOUT_HELPER
@@ -85,14 +92,13 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
 %html
   %head
     %title= h(yield(:title) || "Untitled")
-    = stylesheet_link_tag "blueprint/screen", :media => "screen, projection"
-    = stylesheet_link_tag "blueprint/print", :media => "print"
-    <!--[if lt IE 8]>
-    = stylesheet_link_tag "blueprint/ie", :media => "screen, projection"
-    <![endif]-->
+    = stylesheet_link_tag 'compiled/screen.css', :media => 'screen, projection'
+    = stylesheet_link_tag 'compiled/print.css', :media => 'print'
+    /[if lt IE 8]
+      = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
     = stylesheet_link_tag 'application'
     = yield(:head)
-  %body
+  %body.bp
     #container
       - if show_title?
         #header.span-24.last
