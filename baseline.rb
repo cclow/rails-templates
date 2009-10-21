@@ -1,5 +1,3 @@
-blueprintcss = "/Users/cclow/Code/Ufinity/blueprint-css/blueprint"
-
 git :init
 file '.gitignore', <<-GITIGNORE
 .DS_Store
@@ -37,14 +35,13 @@ run 'rm public/images/rails.png'
 
 #
 gem "dbd-sqlite3", :lib => "sqlite3"
-gem "authlogic"
 gem 'mislav-will_paginate', :lib => 'will_paginate',
   :source => "http://gems.github.com"
 gem 'justinfrench-formtastic', :lib => 'formtastic',
   :source => "http://gems.github.com"
-gem 'haml'
 gem "chriseppstein-compass", :lib => "compass",
   :source => "http://gems.github.com"
+gem 'haml'
 
 gem 'cucumber', :lib => false
 gem 'webrat', :lib => false
@@ -54,7 +51,8 @@ gem "thoughtbot-shoulda", :lib => false,
 gem "notahat-machinist", :lib => false,
   :source => "http://gems.github.com"
 
-rake "gems:install", :sudo => true
+require "haml" rescue rake "gems:install GEM=haml", :sudo => true
+require "compass" rescue rake "gems:install GEM=chriseppstein-compass", :sudo => true
 rake "gems:unpack GEM=chriseppstein-compass"
 
 file 'vendor/plugins/compass/init.rb', <<-CODE
@@ -96,26 +94,27 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
     = stylesheet_link_tag 'compiled/print.css', :media => 'print'
     /[if lt IE 8]
       = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
-    = stylesheet_link_tag 'application'
+    = stylesheet_link_tag 'compiled/application.css', :media => 'screen, projection'
     = yield(:head)
-  %body.bp
+  %body.bp.three-col
     #container
       - if show_title?
-        #header.span-24.last
-          %h1.span-24.last=h yield(:title)
-      #main.span-15.colborder
+        #header
+          %h2=h yield(:title)
+      #content
         = yield
-      #sidebar.span-8.last
+      #sidebar
+        %h3 Sidebar
         - flash.each do |name, msg|
           = content_tag :div, msg, :class => "\#{name} last"
 APPLICATION_HTML
 
-file "public/stylesheets/application.css", <<-APPLICATION_CSS
-#container {
-  width: 960px;
-  margin: 20px auto 0;
-}
-APPLICATION_CSS
+file "app/stylesheets/application.sass", <<-APPLICATION_SASS
+body.three-col
+  #container
+    width: 960px
+    margin: 20px auto 0
+APPLICATION_SASS
 
 generate(:controller, "home", "index")
 route 'map.root :controller => "home"'
@@ -131,6 +130,10 @@ INDEX_HTML
 
 # setup testing
 generate(:cucumber, "--testunit")
+
+webrat_steps="features/step_definitions/webrat_steps.rb"
+run %Q|sed -e "s/(regexp)/(regexp, Regexp::IGNORECASE)/" #{webrat_steps} > #{webrat_steps}.new && mv #{webrat_steps}.new #{webrat_steps}|
+
 file "cucumber.yml", <<-CUCUMBER_YML
 default: -r features -v
 autotest: -r features
@@ -152,11 +155,6 @@ cat >> test/test_helper.rb <<-TEST_HELPER
 
 require "shoulda"
 require File.expand_path(File.dirname(__FILE__) + "/machinist")
-require "authlogic/test_case"
-
-class ActionController::TestCase
-  setup :activate_authlogic
-end
 TEST_HELPER
 TEST_HELPER_RUN
 
@@ -166,6 +164,41 @@ cat >> features/support/env.rb <<-ENV
 require File.expand_path(File.dirname(__FILE__) + "/../../test/machinist")
 ENV
 ENV_RUN
+
+file "features/step_definitions/model_steps.rb", <<-MODEL_STEPS
+Given /^there (is|are) (\\d+) "([^\\"]*)" records?$/ do |_, count, model|
+  @records ||= {}
+  @records[model] ||= []
+  klass = model.camelize.constantize
+  count.to_i.times do |i|
+    @records[model][i] = klass.make
+  end
+end
+
+When /^I fill in "([^\\"]*)" with "([^\\"]*)" value from "([^\\"]*)" record$/ do |field, attr, model|
+  When %Q(I fill in "\#{field}" with "\#{@records[model][0].send(attr)}")
+end
+
+When /^I fill in "([^\\"]*)" with previous "([^\\"]*)"$/ do |field, key|
+  When %Q(I fill in "\#{field}" with "\#{@values[key]}")
+end
+
+When /^I fill in "([^\\"]*)" with sham "([^\\"]*)"$/ do |field, key|
+  @values ||= {}
+  @values[key] = Sham.send(key)
+  When %Q(I fill in "\#{field}" with "\#{@values[key]}")
+end
+
+Then /^I should see "([^\\"]*)" value of "([^\\"]*)" record$/ do |attr, model|
+  Then %Q(I should see "\#{@records[model][0].send(attr)}")
+end
+
+Then /^I should see "([^\\"]*)" values of "([^\\"]*)" records$/ do |attr, model|
+  @records[model].each do |record|
+    Then %Q(I should see "\#{record.send(attr)}")
+  end
+end
+MODEL_STEPS
 
 run "cp config/database.yml config/database_sample.yml"
 run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
