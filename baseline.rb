@@ -131,9 +131,6 @@ INDEX_HTML
 # setup testing
 generate(:cucumber, "--testunit")
 
-webrat_steps="features/step_definitions/webrat_steps.rb"
-run %Q|sed -e "s/(regexp)/(regexp, Regexp::IGNORECASE)/" #{webrat_steps} > #{webrat_steps}.new && mv #{webrat_steps}.new #{webrat_steps}|
-
 file "cucumber.yml", <<-CUCUMBER_YML
 default: -r features -v
 autotest: -r features
@@ -150,20 +147,16 @@ require "faker"
 Dir.glob(File.join(File.dirname(__FILE__), "/machinist/*.rb")).each { |f| require f }
 MACHINIST
 
-run <<-TEST_HELPER_RUN
-cat >> test/test_helper.rb <<-TEST_HELPER
-
+run %Q|cat >> test/test_helper.rb <<-TEST_HELPER
+#
 require "shoulda"
 require File.expand_path(File.dirname(__FILE__) + "/machinist")
-TEST_HELPER
-TEST_HELPER_RUN
+TEST_HELPER|
 
-run <<-ENV_RUN
-cat >> features/support/env.rb <<-ENV
-
+run %Q|cat >> features/support/env.rb <<-ENV
+#
 require File.expand_path(File.dirname(__FILE__) + "/../../test/machinist")
-ENV
-ENV_RUN
+ENV|
 
 file "features/step_definitions/model_steps.rb", <<-MODEL_STEPS
 Given /^there (is|are) (\\d+) "([^\\"]*)" records?$/ do |_, count, model|
