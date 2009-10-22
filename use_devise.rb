@@ -80,7 +80,7 @@ Given /^I am signed in$/ do
   And %Q(I fill in "email" with my "email")
   And %Q(I fill in "password" with my "password")
   And %Q(I press "sign in")
-  Then %Q(I should see /sign in successful/)
+  Then %Q(I should see /Signed in successfully/)
 end
 AUTH_STEPS
 
@@ -96,3 +96,6 @@ User.blueprint do
   password_confirmation         { password }
 end
 USER_BP
+
+git :add => "."
+git :commit => "-m 'add devise & warden authentication'"
