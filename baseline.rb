@@ -29,7 +29,10 @@ gem 'capybara', :group => :test
 gem 'rspec-rails', '>=2.0.0.beta.8', :group => :test
 gem 'cucumber-rails', :group => :test
 gem 'autotest-rails', :group => :test
+gem 'rails3-generators', :group => :development
+
 run 'bundle install'
+run 'bundle lock'
 
 generate 'rspec:install'
 generate 'cucumber:skeleton', "--rspec", "--capybara"
@@ -84,62 +87,11 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
       #footer
         %h3 Footer
 APPLICATION_HTML
-# 
-# file "app/stylesheets/application.sass", <<-APPLICATION_SASS
-# body.three-col
-#   #container
-#     width: 960px
-#     margin: 20px auto 0
-# APPLICATION_SASS
-# 
-# generate(:controller, "home", "index")
-# route 'map.root :controller => "home"'
-# run "rm app/views/home/index.html.erb"
-# file "app/views/home/index.html.haml", <<-INDEX_HTML
-# - title "Home Page"
-# <p>Et vel ut et aspernatur commodi sequi labore.
-# Voluptatem ullam at error possimus ut rerum ut.
-# Sunt illo fuga sed nemo.
-# Dolorum rerum quia commodi aut iure dolorem cum.
-# Accusantium eos perspiciatis voluptatibus ipsum.</p>
-# INDEX_HTML
-# 
-# file "features/step_definitions/model_steps.rb", <<-MODEL_STEPS
-# Given /^there (is|are) (\\d+) "([^\\"]*)" records?$/ do |_, count, model|
-#   @records ||= {}
-#   @records[model] ||= []
-#   klass = model.camelize.constantize
-#   count.to_i.times do |i|
-#     @records[model][i] = klass.make
-#   end
-# end
-# 
-# When /^I fill in "([^\\"]*)" with "([^\\"]*)" value from "([^\\"]*)" record$/ do |field, attr, model|
-#   When %Q(I fill in "\#{field}" with "\#{@records[model][0].send(attr)}")
-# end
-# 
-# When /^I fill in "([^\\"]*)" with previous "([^\\"]*)"$/ do |field, key|
-#   When %Q(I fill in "\#{field}" with "\#{@values[key]}")
-# end
-# 
-# When /^I fill in "([^\\"]*)" with sham "([^\\"]*)"$/ do |field, key|
-#   @values ||= {}
-#   @values[key] = Sham.send(key)
-#   When %Q(I fill in "\#{field}" with "\#{@values[key]}")
-# end
-# 
-# Then /^I should see "([^\\"]*)" value of "([^\\"]*)" record$/ do |attr, model|
-#   Then %Q(I should see "\#{@records[model][0].send(attr)}")
-# end
-# 
-# Then /^I should see "([^\\"]*)" values of "([^\\"]*)" records$/ do |attr, model|
-#   @records[model].each do |record|
-#     Then %Q(I should see "\#{record.send(attr)}")
-#   end
-# end
-# MODEL_STEPS
-# 
-# run "find . -type d -empty | xargs -I xxx touch xxx/.gitignore"
+
+begin
+  generate(:controller, 'home', 'index')
+  route "root :to => 'home#index'"
+end if yes?('Creat default home#index?')
 
 git :add => "."
-git :commit => '-m "Rails app with baseline template"'
+git :commit => '-m "Rails 3 app with baseline template"'
