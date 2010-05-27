@@ -17,6 +17,7 @@ doc/api
 doc/app
 coverage/*
 *.swp
+public/stylesheets/compiled/*
 GITIGNORE|
 
 gem 'haml', ">=3.0.0.rc.5"
@@ -33,7 +34,7 @@ run 'bundle install'
 generate 'rspec:install'
 generate 'cucumber:skeleton', "--rspec", "--capybara"
 
-run 'compass init rails . --using blueprint/semantic --quiet --sass-dir public/stylesheets/sass --css-dir public/stylesheets/'
+run 'compass init rails . --using blueprint/semantic --quiet --sass-dir app/stylesheets --css-dir public/stylesheets/compiled'
 
 # add default layout and home page
 file "app/helpers/layout_helper.rb", <<-LAYOUT_HELPER
@@ -64,10 +65,10 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
 %html
   %head
     %title= h(@page_title || "Untitled")
-    = stylesheet_link_tag 'screen.css', :media => 'screen, projection'
-    = stylesheet_link_tag 'print.css', :media => 'print'
+    = stylesheet_link_tag 'compiled/screen.css', :media => 'screen, projection'
+    = stylesheet_link_tag 'compiled/print.css', :media => 'print'
     /[if lt IE 8]
-      = stylesheet_link_tag 'ie.css', :media => 'screen, projection'
+      = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
     = yield(:head)
   %body.bp.two-col
     #container
