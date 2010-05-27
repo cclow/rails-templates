@@ -88,6 +88,16 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
         %h3 Footer
 APPLICATION_HTML
 
+initializer 'rails3_generators.rb', <<-RAILS3_GEN
+Rails.application.class.configure do
+  config.generators do |g|
+    g.template_engine :haml
+    g.test_framework :rspec, :fixture => true, :views => false
+    g.fixture_replacement :factory_girl, :dir => 'spec/factories'
+  end
+end
+RAILS3_GEN
+
 begin
   generate(:controller, 'home', 'index')
   route "root :to => 'home#index'"
