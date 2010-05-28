@@ -26,8 +26,9 @@ gem 'compass', '>=0.10.1'
 gem 'faker', :group => :test
 gem 'factory_girl', :git => 'git://github.com/cclow/factory_girl.git', :branch => 'rails3', :group => :test
 gem 'capybara', :group => :test
-gem 'rspec-rails', '>=2.0.0.beta.8', :group => :test
+gem 'rspec-rails', '>=2.0.0.beta.9', :group => :test
 gem 'cucumber-rails', :group => :test
+gem 'autotest', :group => :test
 gem 'autotest-rails', :group => :test
 gem 'rails3-generators', :group => :development
 
@@ -73,10 +74,11 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
     /[if lt IE 8]
       = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
     = yield(:head)
+    = csrf_meta_tag
   %body.bp.two-col
     #container
       #header
-        %h2=h(@page_title || "Header")
+        %h2= h(@page_title || "Header")
       #sidebar
         %h3 Sidebar
       #content
