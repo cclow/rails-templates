@@ -40,6 +40,10 @@ generate 'cucumber:skeleton', "--rspec", "--capybara"
 
 run 'compass init rails . --using blueprint/semantic --quiet --sass-dir app/stylesheets --css-dir public/stylesheets/compiled'
 
+run 'mkdir public/javascripts/jquery'
+run 'curl -L http://code.jquery.com/jquery-1.4.2.min.js > public/javascripts/jquery/jquery-1.4.2.min.js'
+run 'curl -L http://github.com/rails/jquery-ujs/raw/master/src/rails.js > public/javascripts/rails.js'
+
 # add default layout and home page
 file "app/helpers/layout_helper.rb", <<-LAYOUT_HELPER
 module LayoutHelper
@@ -88,6 +92,8 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
         = yield
       #footer
         %h3 Footer
+    = javascript_include_tag 'jquery/jquery-1.4.2.min.js'
+    = javascript_include_tag :all, :cache => true
 APPLICATION_HTML
 
 initializer 'rails3_generators.rb', <<-RAILS3_GEN
