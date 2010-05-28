@@ -5,7 +5,7 @@ run 'rm public/images/rails.png'
 run 'cp config/database.yml config/database-sample.yml'
 
 git :init
-run %Q|cat >> '.gitignore', <<-GITIGNORE
+run %Q|cat >> '.gitignore' <<-GITIGNORE
 .DS_Store
 TAGS
 *~
