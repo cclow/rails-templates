@@ -44,6 +44,15 @@ run 'mkdir public/javascripts/jquery'
 run 'curl -L http://code.jquery.com/jquery-1.4.2.min.js > public/javascripts/jquery/jquery-1.4.2.min.js'
 run 'curl -L http://github.com/rails/jquery-ujs/raw/master/src/rails.js > public/javascripts/rails.js'
 
+initializer 'jquery.rb', <<-JQUERY
+module ActionView::Helpers::AssetTagHelper
+  remove_const :JAVASCRIPT_DEFAULT_SOURCES
+  JAVASCRIPT_DEFAULT_SOURCES = %w(jquery/jquery-1.4.2.min.js rails.js)
+
+  reset_javascript_include_default
+end
+JQUERY
+
 # add default layout and home page
 file "app/helpers/layout_helper.rb", <<-LAYOUT_HELPER
 module LayoutHelper
@@ -58,10 +67,6 @@ module LayoutHelper
 
   def stylesheet(*args)
     content_for(:head) { stylesheet_link_tag(*args) }
-  end
-
-  def javascript(*args)
-    content_for(:head) { javascript_include_tag(*args) }
   end
 end
 LAYOUT_HELPER
@@ -92,8 +97,7 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
         = yield
       #footer
         %h3 Footer
-    = javascript_include_tag 'jquery/jquery-1.4.2.min.js'
-    = javascript_include_tag :all, :cache => true
+    = javascript_include_tag :defaults, :cache => true
 APPLICATION_HTML
 
 initializer 'rails3_generators.rb', <<-RAILS3_GEN
