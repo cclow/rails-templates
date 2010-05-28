@@ -68,6 +68,10 @@ module LayoutHelper
   def stylesheet(*args)
     content_for(:head) { stylesheet_link_tag(*args) }
   end
+
+  def javascript(*args)
+    content_for(:js) { javascript_include_tag(*args) }
+  end
 end
 LAYOUT_HELPER
 
@@ -98,6 +102,7 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
       #footer
         %h3 Footer
     = javascript_include_tag :defaults, :cache => true
+    = yield(:js)
 APPLICATION_HTML
 
 initializer 'rails3_generators.rb', <<-RAILS3_GEN
