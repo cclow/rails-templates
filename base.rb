@@ -32,9 +32,6 @@ gem 'autotest', :group => :test
 gem 'autotest-rails', :group => :test
 gem 'rails3-generators', :group => :development
 
-run 'bundle install'
-run 'bundle lock'
-
 generate 'rspec:install'
 generate 'cucumber:skeleton', "--rspec", "--capybara"
 
@@ -52,6 +49,21 @@ module ActionView::Helpers::AssetTagHelper
   reset_javascript_include_default
 end
 JQUERY
+
+initializer 'factory_girl.rb', <<-FACTORY_GIRL
+require File.join(Rails.root, 'factory_girl', 'factories') unless Rails.env == 'production'
+FACTORY_GIRL
+
+run 'mkdir factory_girl'
+inside 'factory_girl' do
+  run 'mkdir factories'
+  file 'factories.rb', <<-FACTORIES
+require "faker"
+
+Dir.glob(File.join(File.dirname(__FILE__), "/factories/*.rb")).each { |f| require f }
+FACTORIES
+end
+
 
 # add default layout and home page
 file "app/helpers/layout_helper.rb", <<-LAYOUT_HELPER
