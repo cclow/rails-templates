@@ -32,6 +32,8 @@ gem 'autotest', :group => :test
 gem 'autotest-rails', :group => :test
 gem 'rails3-generators', :group => :development
 
+run 'bundle install --relock'  if yes?('install bundle?')
+
 generate 'rspec:install'
 generate 'cucumber:skeleton', "--rspec", "--capybara"
 
