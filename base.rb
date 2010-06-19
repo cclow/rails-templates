@@ -23,19 +23,26 @@ GITIGNORE|
 gem 'haml', ">=3.0.0.rc.5"
 gem 'compass', '>=0.10.1'
 
-gem 'faker', :group => :test
-gem 'factory_girl', :git => 'git://github.com/cclow/factory_girl.git', :branch => 'rails3', :group => :test
+gem 'faker', :group => [:test, :development]
+gem 'factory_girl', :git => 'git://github.com/cclow/factory_girl.git', :branch => 'rails3', :group => [:test, :development]
 gem 'capybara', :group => :test
 gem 'rspec-rails', '>=2.0.0.beta.9', :group => :test
 gem 'cucumber-rails', :group => :test
 gem 'autotest', :group => :test
 gem 'autotest-rails', :group => :test
+gem 'shoulda', :group => :test
 gem 'rails3-generators', :group => :development
+gem "awesome_print", :group => :development
 
-run 'bundle install --relock'  if yes?('install bundle?')
+run 'bundle install' if yes?('install bundle?')
 
 generate 'rspec:install'
 generate 'cucumber:skeleton', "--rspec", "--capybara"
+
+inject_into_file 'spec/spec_helper.rb', %Q{\# insert shoulda matchers\nrequire 'shoulda'\n}, :after => %Q{require 'rspec/rails'\n}
+inject_into_file 'spec/spec_helper.rb',
+  %Q{  include Shoulda::ActiveRecord::Matchers\n  include Shoulda::ActionController::Matchers\n\n},
+  :after => %Q{Rspec.configure do |config|\n}
 
 run 'compass init rails . --using blueprint/semantic --quiet --sass-dir app/stylesheets --css-dir public/stylesheets/compiled'
 
