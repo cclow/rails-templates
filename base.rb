@@ -20,13 +20,13 @@ coverage/*
 public/stylesheets/compiled/*
 GITIGNORE|
 
-gem 'haml', ">=3.0.0.rc.5"
-gem 'compass', '>=0.10.1'
+gem 'haml', '>=3.0.13'
+gem 'compass', '>=0.10.2'
 
 gem 'faker', :group => [:test, :development]
 gem 'factory_girl', :git => 'git://github.com/cclow/factory_girl.git', :branch => 'rails3', :group => [:test, :development]
 gem 'capybara', :group => :test
-gem 'rspec-rails', '>=2.0.0.beta.9', :group => :test
+gem 'rspec-rails', '>=2.0.0.beta.14', :group => :test
 gem 'cucumber-rails', :group => :test
 gem 'autotest', :group => :test
 gem 'autotest-rails', :group => :test
