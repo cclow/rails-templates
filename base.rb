@@ -47,14 +47,18 @@ inject_into_file 'spec/spec_helper.rb',
 
 run 'compass init rails . --using blueprint/semantic --quiet --sass-dir app/stylesheets --css-dir public/stylesheets/compiled'
 
-run 'mkdir public/javascripts/jquery'
-run 'curl -L http://code.jquery.com/jquery-1.4.2.min.js > public/javascripts/jquery/jquery-1.4.2.min.js'
-run 'curl -L http://github.com/rails/jquery-ujs/raw/master/src/rails.js > public/javascripts/rails.js'
+if yes?('Download JQuery?')
+  run 'curl -L http://code.jquery.com/jquery-1.4.2.min.js > public/javascripts/jquery-1.4.2.min.js'
+  run 'curl -L http://github.com/rails/jquery-ujs/raw/master/src/rails.js > public/javascripts/rails.js'
+else
+  run 'cp ../rails-templates/archive/jquery/rails.js public/javascripts/rails.js'
+  run 'cp ../rails-templates/archive/jquery/jquery-1.4.2.min.js public/javascripts/jquery-1.4.2.min.js'
+end
 
 initializer 'jquery.rb', <<-JQUERY
 module ActionView::Helpers::AssetTagHelper
   remove_const :JAVASCRIPT_DEFAULT_SOURCES
-  JAVASCRIPT_DEFAULT_SOURCES = %w(jquery/jquery-1.4.2.min.js rails.js)
+  JAVASCRIPT_DEFAULT_SOURCES = %w(jquery-1.4.2.min.js rails.js)
 
   reset_javascript_include_default
 end
