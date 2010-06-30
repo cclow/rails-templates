@@ -2,7 +2,6 @@ run 'rm README'
 run 'rm doc/README_FOR_APP'
 run 'rm public/index.html'
 run 'rm public/images/rails.png'
-run 'cp config/database.yml config/database-sample.yml'
 
 git :init
 run %Q|cat >> '.gitignore' <<-GITIGNORE
@@ -37,7 +36,9 @@ gem "awesome_print", :group => :development
 run 'bundle install' if yes?('install bundle?')
 
 generate 'rspec:install'
-generate 'cucumber:skeleton', "--rspec", "--capybara"
+generate 'cucumber:install', "--rspec", "--capybara"
+
+run 'cp config/database.yml config/database-sample.yml'
 
 inject_into_file 'spec/spec_helper.rb', %Q{\# insert shoulda matchers\nrequire 'shoulda'\n}, :after => %Q{require 'rspec/rails'\n}
 inject_into_file 'spec/spec_helper.rb',
