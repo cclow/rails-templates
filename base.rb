@@ -23,7 +23,7 @@ gem 'haml', '>=3.0.13'
 gem 'compass', '>=0.10.2'
 
 gem 'faker', :group => [:test, :development]
-gem 'factory_girl', :git => 'git://github.com/cclow/factory_girl.git', :branch => 'rails3', :group => [:test, :development]
+gem 'factory_girl_rails', :group => [:test, :development]
 gem 'capybara', :group => :test
 gem 'rspec-rails', '>=2.0.0.beta.14', :group => :test
 gem 'cucumber-rails', :group => :test
