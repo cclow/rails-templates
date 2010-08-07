@@ -1,3 +1,6 @@
+archive ||= File.join(File.dirname(__FILE__), 'archive')
+git_archive ||= "http://github.com/cclow/rails-templates/raw/master/archive/"
+
 run 'rm README'
 run 'rm doc/README_FOR_APP'
 run 'rm public/index.html'
@@ -45,21 +48,13 @@ generate 'cucumber:install', "--rspec", "--capybara"
 
 run 'cp config/database.yml config/database-sample.yml'
 
+run "cp #{archive}/cucumber/model_steps.rb features/step_definitions/model_steps.rb"
+
 inject_into_file 'spec/spec_helper.rb', %Q{\# insert shoulda matchers\nrequire 'shoulda'\n},
   :after => %Q{require 'rspec/rails'\n}
 inject_into_file 'spec/spec_helper.rb',
   %Q{  include Shoulda::ActiveRecord::Matchers\n  include Shoulda::ActionController::Matchers\n\n},
   :after => %Q{Rspec.configure do |config|\n}
-
-if yes?('Download JQuery?')
-  run 'curl -L http://code.jquery.com/jquery-1.4.2.min.js > public/javascripts/jquery.js'
-  run 'curl -L http://github.com/rails/jquery-ujs/raw/master/src/rails.js > public/javascripts/rails.js'
-else
-  run 'cp ../rails-templates/archive/jquery/rails.js public/javascripts/rails.js'
-  run 'cp ../rails-templates/archive/jquery/jquery-1.4.2.min.js public/javascripts/jquery.js'
-end
-
-application %Q{config.action_view.javascript_expansions[:defaults] = %w(jquery rails)}
 
 initializer 'factory_girl.rb', <<-FACTORY_GIRL
 require File.join(Rails.root, 'factory_girl', 'factories') unless Rails.env == 'production'
@@ -75,6 +70,15 @@ Dir.glob(File.join(File.dirname(__FILE__), "/factories/*.rb")).each { |f| requir
 FACTORIES
 end
 
+generate 'haml:install'
+generate 'jquery:install'
+
+application %Q{config.action_view.javascript_expansions[:defaults] = %w(jquery rails)}
+
+if yes?("Apply JQuery Pageless?")
+  apply File.join(File.dirname(__FILE__), 'use_pageless.rb')
+end
+
 
 # add default layout and home page
 file "app/helpers/layout_helper.rb", <<-LAYOUT_HELPER
@@ -88,12 +92,14 @@ module LayoutHelper
     @show_title
   end
 
-  def stylesheet(*args)
-    content_for(:head) { stylesheet_link_tag(*args) }
+  def css_link(*args)
+    @css_links ||=[]
+    @css_links +=args
   end
 
-  def javascript(*args)
-    content_for(:js) { javascript_include_tag(*args) }
+  def js_include(*args)
+    @js_includes ||= []
+    @js_includes += args
   end
 end
 LAYOUT_HELPER
@@ -109,14 +115,14 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
     = stylesheet_link_tag 'compiled/print.css', :media => 'print'
     /[if lt IE 8]
       = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
+    - @css_links.present? \&\& @css_links.uniq.each do |css|
+      = styelsheet_link_tag css, :media => 'screen, projection'
     = yield(:head)
     = csrf_meta_tag
-  %body.bp.two-col
+  %body
     #container
       #header
         %h2= h(@page_title || "Header")
-      #sidebar
-        %h3 Sidebar
       #content
         %h3 Content
         - flash.each do |name, msg|
@@ -124,8 +130,10 @@ file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
         = yield
       #footer
         %h3 Footer
-    = javascript_include_tag :defaults, :cache => true
-    = yield(:js)
+  = javascript_include_tag :defaults, :cache => true
+  - @js_includes.present? \&\& @js_includes.uniq.each do |js|
+    = javascript_include_tag js, :cache => true
+  = yield(:js)
 APPLICATION_HTML
 
 initializer 'rails3_generators.rb', <<-RAILS3_GEN

@@ -1,2 +1,2 @@
 Usage:
-  rails app -m "http://github.com/cclow/rails-templates/raw/master/template.rb"
+  rails new app -m "http://github.com/cclow/rails-templates/raw/master/template.rb"
