@@ -1,6 +1,12 @@
-require File.join(File.dirname(__FILE__), 'lib', 'copy_archive')
+require 'open-uri'
 
-copy_from_archive "jquery/jquery.pageless.js", "public/javascripts/jquery.pageless.js"
+@archive ||= File.join(File.dirname(__FILE__), 'archive')
+
+if URI.parse(@archive).scheme
+  run %Q{curl -L #{@archive}/jquery/jquery.pageless.js > public/javascripts/jquery.pageless.js}
+else
+  run %Q{cp #{@archive}/jquery/jquery.pageless.js public/javascripts/jquery.pageless.js}
+end
 
 file "app/helpers/pageless_helper.rb", <<-PAGELESS_HELPER
 module PagelessHelper

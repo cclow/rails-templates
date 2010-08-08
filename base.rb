@@ -1,4 +1,6 @@
-require File.join(File.dirname(__FILE__), 'lib', 'copy_archive')
+require 'open-uri'
+
+@archive ||= File.join(File.dirname(__FILE__), 'archive')
 
 run 'rm README'
 run 'rm doc/README_FOR_APP'
@@ -47,7 +49,11 @@ generate 'cucumber:install', "--rspec", "--capybara"
 
 run 'cp config/database.yml config/database-sample.yml'
 
-copy_from_archive "cucumber/model_steps.rb", "features/step_definitions/model_steps.rb"
+if URI.parse(@archive).scheme
+  run %Q{curl -L #{@archive}/cucumber/model_steps.rb > features/step_definitions/model_steps.rb}
+else
+  run %Q{cp #{@archive}/cucumber/model_steps.rb features/step_definitions/model_steps.rb}
+end
 
 inject_into_file 'spec/spec_helper.rb', %Q{\# insert shoulda matchers\nrequire 'shoulda'\n},
   :after => %Q{require 'rspec/rails'\n}
