@@ -1,10 +1,6 @@
-ARCHIVE ||= File.join(File.dirname(__FILE__), 'archive')
+require File.join(File.dirname(__FILE__), 'lib', 'copy_archive')
 
-if yes?("Download JQuery Pageless?")
-  run 'curl -L http://github.com/jney/jquery.pageless/raw/master/lib/jquery.pageless.js > public/javascripts/jquery.pageless.js'
-else
-  run "cp #{ARCHIVE}/jquery/jquery.pageless.js public/javascripts/jquery.pageless.js"
-end
+copy_from_archive "jquery/jquery.pageless.js", "public/javascripts/jquery.pageless.js"
 
 file "app/helpers/pageless_helper.rb", <<-PAGELESS_HELPER
 module PagelessHelper

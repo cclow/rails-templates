@@ -1,5 +1,4 @@
-archive ||= File.join(File.dirname(__FILE__), 'archive')
-git_archive ||= "http://github.com/cclow/rails-templates/raw/master/archive/"
+require File.join(File.dirname(__FILE__), 'lib', 'copy_archive')
 
 run 'rm README'
 run 'rm doc/README_FOR_APP'
@@ -48,7 +47,7 @@ generate 'cucumber:install', "--rspec", "--capybara"
 
 run 'cp config/database.yml config/database-sample.yml'
 
-run "cp #{archive}/cucumber/model_steps.rb features/step_definitions/model_steps.rb"
+copy_from_archive "cucumber/model_steps.rb", "features/step_definitions/model_steps.rb"
 
 inject_into_file 'spec/spec_helper.rb', %Q{\# insert shoulda matchers\nrequire 'shoulda'\n},
   :after => %Q{require 'rspec/rails'\n}
