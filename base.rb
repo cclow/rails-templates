@@ -70,15 +70,27 @@ inside 'factory_girl' do
   run 'mkdir factories'
   file 'factories.rb', <<-FACTORIES
 require "faker"
+require "factory_girl/syntax/sham"
 
 Dir.glob(File.join(File.dirname(__FILE__), "/factories/*.rb")).each { |f| require f }
 FACTORIES
 end
 
 generate 'haml:install'
+
+run 'mkdir -p app/sass'
+run 'mkdir -p public/stylesheets/compiled'
+run 'touch app/sass/screen.scss'
+run 'touch app/sass/print.scss'
+run 'touch app/sass/ie.scss'
+run %Q|cat >> config/application.rb <<-SASS
+Sass::Plugin.options[:style] = :compact
+Sass::Plugin.options[:template_location] = { 'app/sass' => 'public/stylesheets/compiled' }
+SASS|
+
 generate 'jquery:install'
 
-application %Q{config.action_view.javascript_expansions[:defaults] = %w(jquery rails)}
+application "config.action_view.javascript_expansions[:defaults] = %w(jquery rails)"
 
 if yes?("Apply JQuery Pageless?")
   apply File.join(File.dirname(__FILE__), 'use_pageless.rb')
