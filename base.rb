@@ -2,30 +2,21 @@ require 'open-uri'
 
 @archive ||= File.join(File.dirname(__FILE__), 'archive')
 
+def archive_copy(archive, from, to)
+  if URI.parse(archive).scheme
+    run "curl -L #{archive}/#{from} > #{to}"
+  else
+    run "cp #{archive}/#{from} #{to}"
+  end
+end
+
 run 'rm README'
 run 'rm doc/README_FOR_APP'
 run 'rm public/index.html'
 run 'rm public/images/rails.png'
 
 git :init
-run %Q|cat >> '.gitignore' <<-GITIGNORE
-.bundle
-db/*.sqlite3
-log/*.log
-tmp/**/*
-.DS_Store
-TAGS
-*~
-.#*
-db/schema.rb
-db/*.sqlite3
-config/database.yml
-doc/api
-doc/app
-coverage/*
-*.swp
-public/stylesheets/compiled/*
-GITIGNORE|
+archive_copy(@archive, 'base/gitignore', '.gitignore')
 
 gem 'haml', '>=3.0.13'
 # gem 'sqlite3-ruby', :require => 'sqlite3'
@@ -49,11 +40,7 @@ generate 'cucumber:install', "--rspec", "--capybara"
 
 run 'cp config/database.yml config/database-sample.yml'
 
-if URI.parse(@archive).scheme
-  run %Q{curl -L #{@archive}/cucumber/model_steps.rb > features/step_definitions/model_steps.rb}
-else
-  run %Q{cp #{@archive}/cucumber/model_steps.rb features/step_definitions/model_steps.rb}
-end
+archive_copy(@archive, '/cucumber/model_steps.rb', 'features/step_definitions/model_steps.rb')
 
 inject_into_file 'spec/spec_helper.rb', %Q{\# insert shoulda matchers\nrequire 'shoulda'\n},
   :after => %Q{require 'rspec/rails'\n}
@@ -96,62 +83,10 @@ if yes?("Apply JQuery Pageless?")
   apply File.join(File.dirname(__FILE__), 'use_pageless.rb')
 end
 
-
 # add default layout and home page
-file "app/helpers/layout_helper.rb", <<-LAYOUT_HELPER
-module LayoutHelper
-  def title(page_title, show_title = true)
-    @page_title = page_title.to_s
-    @show_title = show_title
-  end
-
-  def show_title?
-    @show_title
-  end
-
-  def css_link(*args)
-    @css_links ||=[]
-    @css_links +=args
-  end
-
-  def js_include(*args)
-    @js_includes ||= []
-    @js_includes += args
-  end
-end
-LAYOUT_HELPER
-
+archive_copy(@archive, 'base/layout_helper.rb', 'app/helpers/layout_helper.rb')
+archive_copy(@archive, 'base/application.html.haml', 'app/views/layouts/application.html.haml')
 run 'rm app/views/layouts/application.html.erb'
-
-file "app/views/layouts/application.html.haml", <<-APPLICATION_HTML
-!!!
-%html
-  %head
-    %title= h(@page_title || "Untitled")
-    = stylesheet_link_tag 'compiled/screen.css', :media => 'screen, projection'
-    = stylesheet_link_tag 'compiled/print.css', :media => 'print'
-    /[if lt IE 8]
-      = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
-    - @css_links.present? \&\& @css_links.uniq.each do |css|
-      = styelsheet_link_tag css, :media => 'screen, projection'
-    = yield(:head)
-    = csrf_meta_tag
-  %body
-    #container
-      #header
-        %h2= h(@page_title || "Header")
-      #content
-        %h3 Content
-        - flash.each do |name, msg|
-          = content_tag :div, msg, :class => name.to_s
-        = yield
-      #footer
-        %h3 Footer
-  = javascript_include_tag :defaults, :cache => true
-  - @js_includes.present? \&\& @js_includes.uniq.each do |js|
-    = javascript_include_tag js, :cache => true
-  = yield(:js)
-APPLICATION_HTML
 
 initializer 'rails3_generators.rb', <<-RAILS3_GEN
 Rails.application.class.configure do

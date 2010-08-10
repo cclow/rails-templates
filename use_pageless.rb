@@ -1,25 +1,13 @@
 require 'open-uri'
 
-@archive ||= File.join(File.dirname(__FILE__), 'archive')
+@pageless_archive ||= File.join(File.dirname(__FILE__), 'archive', 'jquery', 'pageless')
 
-if URI.parse(@archive).scheme
-  run %Q{curl -L #{@archive}/jquery/jquery.pageless.js > public/javascripts/jquery.pageless.js}
+if URI.parse(@pageless_archive).scheme
+  run %Q{curl -L #{@pageless_archive}/jquery.pageless.js > public/javascripts/jquery.pageless.js}
+  run %Q{curl -L #{@pageless_archive}/pageless_helper.rb > app/helpers/pageless_helper.rb}
+  run %Q{curl -L #{@pageless_archive}/load.gif > public/images/load.gif}
 else
-  run %Q{cp #{@archive}/jquery/jquery.pageless.js public/javascripts/jquery.pageless.js}
+  run %Q{cp #{@pageless_archive}/jquery.pageless.js public/javascripts/jquery.pageless.js}
+  run %Q{cp #{@pageless_archive}/pageless_helper.rb app/helpers/pageless_helper.rb}
+  run %Q{cp #{@pageless_archive}/load.gif public/images/load.gif}
 end
-
-file "app/helpers/pageless_helper.rb", <<-PAGELESS_HELPER
-module PagelessHelper
-  def pageless_js(div, total_pages, url=nil)
-    opts = {
-      :totalPages => total_pages,
-      :url        => url,
-      :loaderMsg  => 'Loading more results'
-    }
-  
-    content_for(:js) do
-      javascript_tag %Q{$('\#{div}').pageless(\#{opts.to_json});}
-    end
-  end
-end
-PAGELESS_HELPER
