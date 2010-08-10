@@ -19,8 +19,8 @@ git :init
 archive_copy(@archive, 'base/gitignore', '.gitignore')
 
 gem 'haml', '>=3.0.13'
-# gem 'sqlite3-ruby', :require => 'sqlite3'
 gem 'will_paginate', :branch => 'rails3', :git => 'git://github.com/cclow/will_paginate.git'
+gem "simple_form"
 
 gem 'faker', :group => [:test, :development]
 gem 'factory_girl_rails', :group => [:test, :development]
@@ -35,6 +35,7 @@ gem "awesome_print", :group => :development
 
 run 'bundle install'
 
+generate 'simple_form:install'
 generate 'rspec:install'
 generate 'cucumber:install', "--rspec", "--capybara"
 
@@ -52,16 +53,8 @@ initializer 'factory_girl.rb', <<-FACTORY_GIRL
 require File.join(Rails.root, 'factory_girl', 'factories') unless Rails.env == 'production'
 FACTORY_GIRL
 
-run 'mkdir factory_girl'
-inside 'factory_girl' do
-  run 'mkdir factories'
-  file 'factories.rb', <<-FACTORIES
-require "faker"
-require "factory_girl/syntax/sham"
-
-Dir.glob(File.join(File.dirname(__FILE__), "/factories/*.rb")).each { |f| require f }
-FACTORIES
-end
+run 'mkdir -p factory_girl/factories'
+archive_copy(@archive, 'base/factories.rb', 'factory_girl/factories.rb')
 
 generate 'haml:install'
 
@@ -97,11 +90,6 @@ Rails.application.class.configure do
   end
 end
 RAILS3_GEN
-
-begin
-  generate(:controller, 'home', 'index')
-  route "root :to => 'home#index'"
-end if yes?('Creat default home#index?')
 
 git :add => "."
 git :commit => '-m "Rails 3 app with baseline template"'
