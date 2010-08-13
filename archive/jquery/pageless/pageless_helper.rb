@@ -5,9 +5,9 @@ module PagelessHelper
       :url        => url,
       :loaderMsg  => 'Loading more results'
     }
-
+    js_include('jquery.pageless.js')
     content_for(:js) do
-      javascript_tag %Q{$('##{table_name}').pageless(#{opts.to_json});}
+      javascript_tag %Q{$('##{div}').pageless(#{opts.to_json});}
     end
   end
 end
