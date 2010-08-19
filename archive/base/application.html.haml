@@ -13,7 +13,7 @@
   %body
     #container
       #header
-        %h2= h(@page_title || "Header")
+        %h2= h(@page_title || "Untitled")
       #content
         %h3 Content
         - flash.each do |name, msg|
@@ -24,4 +24,10 @@
   = javascript_include_tag :defaults, :cache => true
   - @js_includes.present? && @js_includes.uniq.each do |js|
     = javascript_include_tag js, :cache => true
-  = yield(:js)
+  - if @ready_js.present?
+    <script>
+    $(document).ready(function() {
+    - @ready_js.uniq.each do |js|
+      = raw js
+    });
+    </script>

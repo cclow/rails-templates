@@ -21,6 +21,7 @@ archive_copy(@archive, 'base/gitignore', '.gitignore')
 gem 'haml', '>=3.0.13'
 gem 'will_paginate', :branch => 'rails3', :git => 'git://github.com/cclow/will_paginate.git'
 gem "simple_form"
+gem 'escape_utils'
 
 gem 'faker', :group => [:test, :development]
 gem 'factory_girl_rails', :group => [:test, :development]
@@ -41,7 +42,7 @@ generate 'cucumber:install', "--rspec", "--capybara"
 
 run 'cp config/database.yml config/database-sample.yml'
 
-archive_copy(@archive, '/cucumber/model_steps.rb', 'features/step_definitions/model_steps.rb')
+archive_copy(@archive, '/base/escape_utils.rb', 'config/initializers/escape_utils.rb')
 
 inject_into_file 'spec/spec_helper.rb', %Q{\# insert shoulda matchers\nrequire 'shoulda'\n},
   :after => %Q{require 'rspec/rails'\n}
@@ -63,18 +64,15 @@ run 'mkdir -p public/stylesheets/compiled'
 run 'touch app/sass/screen.scss'
 run 'touch app/sass/print.scss'
 run 'touch app/sass/ie.scss'
-run %Q|cat >> config/application.rb <<-SASS
+
+initializer 'sass.rb', <<-SASS
 Sass::Plugin.options[:style] = :compact
 Sass::Plugin.options[:template_location] = { 'app/sass' => 'public/stylesheets/compiled' }
-SASS|
+SASS
 
 generate 'jquery:install'
 
 application "config.action_view.javascript_expansions[:defaults] = %w(jquery rails)"
-
-if yes?("Apply JQuery Pageless?")
-  apply File.join(File.dirname(__FILE__), 'use_pageless.rb')
-end
 
 # add default layout and home page
 archive_copy(@archive, 'base/layout_helper.rb', 'app/helpers/layout_helper.rb')
@@ -90,6 +88,16 @@ Rails.application.class.configure do
   end
 end
 RAILS3_GEN
+
+apply File.join(File.dirname(__FILE__), 'use_auto_focus.rb')
+
+if yes?("Apply JQuery Pageless?")
+  apply File.join(File.dirname(__FILE__), 'use_pageless.rb')
+end
+
+if yes?("Apply JQuery Anytime Date Time Picker?")
+  apply File.join(File.dirname(__FILE__), 'use_anytime.rb')
+end
 
 git :add => "."
 git :commit => '-m "Rails 3 app with baseline template"'

@@ -17,4 +17,9 @@ module LayoutHelper
     @js_includes ||= []
     @js_includes += args
   end
+
+  def ready_js(*args)
+    @ready_js ||= []
+    @ready_js += args
+  end
 end
