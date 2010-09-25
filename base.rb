@@ -18,21 +18,29 @@ run 'rm public/images/rails.png'
 git :init
 archive_copy(@archive, 'base/gitignore', '.gitignore')
 
-gem 'haml', '>=3.0.13'
-gem 'will_paginate', :branch => 'rails3', :git => 'git://github.com/cclow/will_paginate.git'
+gem 'haml', '>=3.0.17'
+gem 'will_paginate', ">=3.0.pre2"
 gem "simple_form"
 gem 'escape_utils'
+gem 'hpricot'
+gem 'ruby_parser'
+gem 'devise'
+gem 'cancan'
 
 gem 'faker', :group => [:test, :development]
 gem 'factory_girl_rails', :group => [:test, :development]
+gem 'rspec-rails', '>=2.0.0.beta.20', :group => [ :test, :development ]
 gem 'capybara', :group => :test
-gem 'rspec-rails', '>=2.0.0.beta.19', :group => :test
 gem 'cucumber-rails', :group => :test
 gem 'autotest', :group => :test
 gem 'autotest-rails', :group => :test
 gem 'shoulda', :group => :test
+gem 'launchy', :group => :test
+gem 'email_spec', :group => :test
 gem 'rails3-generators', :group => :development
 gem "awesome_print", :group => :development
+gem "haml-rails", :group => :development
+gem 'jquery-rails', :group => :development
 
 run 'bundle install'
 
@@ -44,11 +52,8 @@ run 'cp config/database.yml config/database-sample.yml'
 
 archive_copy(@archive, '/base/escape_utils.rb', 'config/initializers/escape_utils.rb')
 
-inject_into_file 'spec/spec_helper.rb', %Q{\# insert shoulda matchers\nrequire 'shoulda'\n},
-  :after => %Q{require 'rspec/rails'\n}
-inject_into_file 'spec/spec_helper.rb',
-  %Q{  include Shoulda::ActiveRecord::Matchers\n  include Shoulda::ActionController::Matchers\n\n},
-  :after => %Q{Rspec.configure do |config|\n}
+run 'mkdir -p spec/support'
+archive_copy(@archive, '/base/shoulda.rb', 'spec/support/shoulda.rb')
 
 initializer 'factory_girl.rb', <<-FACTORY_GIRL
 require File.join(Rails.root, 'factory_girl', 'factories') unless Rails.env == 'production'
