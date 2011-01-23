@@ -29,7 +29,7 @@ gem 'cancan'
 
 gem 'faker', :group => [:test, :development]
 gem 'factory_girl_rails', :group => [:test, :development]
-gem 'rspec-rails', '>=2.0.0.beta.20', :group => [ :test, :development ]
+gem 'rspec-rails', :group => [ :test, :development ]
 gem 'capybara', :group => :test
 gem 'cucumber-rails', :group => :test
 gem 'autotest', :group => :test
@@ -76,11 +76,11 @@ Sass::Plugin.options[:style] = :compact
 Sass::Plugin.options[:template_location] = { 'app/sass' => 'public/stylesheets/compiled' }
 SASS
 
-generate 'jquery:install'
+generate 'jquery:install', '--ui'
 
 gsub_file "config/application.rb", /^\s+# JavaScript.*\n/, ""
 gsub_file "config/application.rb", /^\s+config\.action_view\.javascript.*\n/, ""
-application "config.action_view.javascript_expansions[:defaults] = %w(jquery.min rails)"
+application "config.action_view.javascript_expansions[:defaults] = %w(jquery.min jquery-ui.min rails)"
 
 # add default layout and home page
 archive_copy(@archive, 'base/layout_helper.rb', 'app/helpers/layout_helper.rb')
