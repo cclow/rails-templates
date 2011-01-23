@@ -44,6 +44,7 @@ gem 'jquery-rails', :group => :development
 
 run 'bundle install'
 
+generate 'cancan:ability'
 generate 'simple_form:install'
 generate 'rspec:install'
 generate 'cucumber:install', "--rspec", "--capybara"
@@ -77,7 +78,9 @@ SASS
 
 generate 'jquery:install'
 
-application "config.action_view.javascript_expansions[:defaults] = %w(jquery rails)"
+gsub_file "config/application.rb", /^\s+# JavaScript.*\n/, ""
+gsub_file "config/application.rb", /^\s+config\.action_view\.javascript.*\n/, ""
+application "config.action_view.javascript_expansions[:defaults] = %w(jquery.min rails)"
 
 # add default layout and home page
 archive_copy(@archive, 'base/layout_helper.rb', 'app/helpers/layout_helper.rb')
