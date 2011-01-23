@@ -8,6 +8,10 @@ module LayoutHelper
     @show_title
   end
 
+  def page_title
+    (@page_title || "Untitled") if show_title?
+  end
+
   def css_link(*args)
     @css_links ||=[]
     @css_links +=args
