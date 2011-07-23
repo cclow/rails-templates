@@ -17,14 +17,16 @@
   = csrf_meta_tag
 %body
   .container
-    %header
-      %h1= page_title
-    #main.sixteen.columns
+    %header.sixteen.columns
+      %h1.romove-bottom= page_title
+    %section.two-thirds.column
       %h3 Content
       - flash.each do |name, msg|
         = content_tag :div, msg, :class => name.to_s
       = yield
-    %footer
+    %nav.one-third.column
+      %h3 Navigation
+    %footer.sixteen.columns
       %h3 Footer
   = javascript_include_tag 'application'
   - if @ready_js.present?
