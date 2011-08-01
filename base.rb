@@ -1,17 +1,7 @@
 # run with
 # rails new project -T --skip-bundle -m rails-templates/base.rb
 #
-require 'open-uri'
-
-@archive ||= File.join(File.dirname(__FILE__), 'archive')
-
-def archive_copy(archive, from, to)
-  if URI.parse(archive).scheme
-    run "curl -L #{archive}/#{from} > #{to}"
-  else
-    run "cp #{archive}/#{from} #{to}"
-  end
-end
+require File.join(File.dirname(__FILE__), 'archive_helper')
 
 git :init
 
@@ -24,6 +14,9 @@ run 'rm app/assets/images/rails.png'
 
 gem "simple_form"
 gem "haml-rails"
+
+# last known workign beta version with rails-3.1.rc4
+gem 'sprockets', '2.0.0.beta.10'
 
 gem 'faker', :group => [:test, :development]
 gem 'factory_girl_rails', :group => [:test, :development]
@@ -46,17 +39,17 @@ run 'cp config/database.yml config/database-sample.yml'
 run 'echo "config/database.yml" >> .gitignore'
 
 # add default layout and home page
-archive_copy(@archive, 'base/layout_helper.rb', 'app/helpers/layout_helper.rb')
+archive_copy('base/layout_helper.rb', 'app/helpers/layout_helper.rb')
 run 'rm app/views/layouts/application.html.erb'
-archive_copy(@archive, 'base/application.html.haml', 'app/views/layouts/application.html.haml')
-archive_copy(@archive, 'base/images/favicon.ico', 'app/assets/images/favicon.ico')
-archive_copy(@archive, 'base/images/apple-touch-icon.png', 'app/assets/images/apple-touch-icon.png')
-archive_copy(@archive, 'base/images/apple-touch-icon-72x72.png', 'app/assets/images/apple-touch-icon-72x72.png')
-archive_copy(@archive, 'base/images/apple-touch-icon-114x114.png', 'app/assets/images/apple-touch-icon-114x114.png')
-archive_copy(@archive, 'base/stylesheets/base.css', 'app/assets/stylesheets/base.css')
-archive_copy(@archive, 'base/stylesheets/skeleton.css', 'app/assets/stylesheets/skeleton.css')
-archive_copy(@archive, 'base/stylesheets/layout.css', 'app/assets/stylesheets/layout.css')
-archive_copy(@archive, 'base/javascripts/tabs.js', 'app/assets/javascripts/tabs.js')
+archive_copy('base/application.html.haml', 'app/views/layouts/application.html.haml')
+archive_copy('base/images/favicon.ico', 'app/assets/images/favicon.ico')
+archive_copy('base/images/apple-touch-icon.png', 'app/assets/images/apple-touch-icon.png')
+archive_copy('base/images/apple-touch-icon-72x72.png', 'app/assets/images/apple-touch-icon-72x72.png')
+archive_copy('base/images/apple-touch-icon-114x114.png', 'app/assets/images/apple-touch-icon-114x114.png')
+archive_copy('base/stylesheets/base.css', 'app/assets/stylesheets/base.css')
+archive_copy('base/stylesheets/skeleton.css', 'app/assets/stylesheets/skeleton.css')
+archive_copy('base/stylesheets/layout.css', 'app/assets/stylesheets/layout.css')
+archive_copy('base/javascripts/tabs.js', 'app/assets/javascripts/tabs.js')
 
 initializer 'rails3_generators.rb', <<-RAILS3_GEN
 Rails.application.config.generators do |g|
