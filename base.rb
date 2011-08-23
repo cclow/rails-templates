@@ -5,58 +5,60 @@ require File.join(File.dirname(__FILE__), 'archive_helper')
 
 git :init
 
+run 'echo "# rvm current environment : `rvm current`" > .rvmrc'
 run 'echo "rvm use `rvm current`" | sed "s/@.*//" > .rvmrc'
 run 'rvm rvmrc trust'
 
-run 'rm doc/README_FOR_APP'
-run 'rm public/index.html'
-run 'rm app/assets/images/rails.png'
+remove_file 'doc/README_FOR_APP'
+remove_file 'public/index.html'
+remove_file 'app/assets/images/rails.png'
 
-gem "simple_form"
-gem "haml-rails"
+run 'cp config/database.yml config/database-sample.yml'
+append_file '.gitignore', "config/database.yml\n"
 
-# last known workign beta version with rails-3.1.rc4
-gem 'sprockets', '2.0.0.beta.10'
+gem 'simple_form'
+gem 'slim-rails'
 
 gem 'faker', :group => [:test, :development]
 gem 'factory_girl_rails', :group => [:test, :development]
-gem 'rspec-rails', :group => [ :test, :development ]
-gem 'capybara', :group => :test
-gem 'autotest', :group => :test
-gem 'autotest-rails', :group => :test
-gem 'shoulda-matchers', :group => :test
-gem 'launchy', :group => :test
-gem 'email_spec', :group => :test
+gem 'rspec-rails', :group => [:test, :development ]
+gem 'capybara', :group => [:test, :development]
+gem 'jasmine', :group => [:test, :development ]
+gem 'launchy', :group => [:test, :development]
+gem 'database_cleaner', :group => [:test, :development]
+gem 'guard-rspec', :group => [:test, :development]
+gem 'shoulda-matchers', :group => [:test, :development]
 gem 'rails3-generators', :group => :development
-gem "awesome_print", :group => :development
+gem 'awesome_print', :group => :development
+gem 'rb-fsevent', :require => false, :group => [:test, :development] if RUBY_PLATFORM =~ /darwin/i
 
-run 'bundle install --path vendor && bundle package && echo "vendor/ruby" >> .gitignore'
+append_file '.gitignore', "vendor/ruby\n"
+run 'bundle install --path vendor && bundle package'
 
 generate 'simple_form:install'
 generate 'rspec:install'
-
-run 'cp config/database.yml config/database-sample.yml'
-run 'echo "config/database.yml" >> .gitignore'
+inside 'spec' do
+  empty_directory 'routing'
+  empty_directory 'support'
+end
+run 'bundle exec jasmine init'
+remove_file 'lib/tasks/jasmine.rake'
+run 'bundle exec guard init rspec'
 
 # add default layout and home page
 archive_copy('base/layout_helper.rb', 'app/helpers/layout_helper.rb')
-run 'rm app/views/layouts/application.html.erb'
-archive_copy('base/application.html.haml', 'app/views/layouts/application.html.haml')
-archive_copy('base/images/favicon.ico', 'app/assets/images/favicon.ico')
-archive_copy('base/images/apple-touch-icon.png', 'app/assets/images/apple-touch-icon.png')
-archive_copy('base/images/apple-touch-icon-72x72.png', 'app/assets/images/apple-touch-icon-72x72.png')
-archive_copy('base/images/apple-touch-icon-114x114.png', 'app/assets/images/apple-touch-icon-114x114.png')
-archive_copy('base/stylesheets/base.css', 'app/assets/stylesheets/base.css')
-archive_copy('base/stylesheets/skeleton.css', 'app/assets/stylesheets/skeleton.css')
-archive_copy('base/stylesheets/layout.css', 'app/assets/stylesheets/layout.css')
-archive_copy('base/javascripts/tabs.js', 'app/assets/javascripts/tabs.js')
+archive_copy('base/application.html.slim', 'app/views/layouts/application.html.slim')
+remove_file 'app/views/layouts/application.html.erb'
+
+initializer 'slim.rb', <<-SLIM
+Slim::Engine.set_default_options :pretty => true unless Rails.env == 'production'
+SLIM
 
 initializer 'rails3_generators.rb', <<-RAILS3_GEN
 Rails.application.config.generators do |g|
   g.test_framework :rspec, :fixture => true, :views => false
   g.fixture_replacement :factory_girl, :dir => 'spec/factories'
-  g.form_builder :simple_form
-  g.template_engine :haml
+  g.template_engine :slim
 end
 RAILS3_GEN
 

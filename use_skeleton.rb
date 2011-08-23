@@ -1,0 +1,10 @@
+require File.join(File.dirname(__FILE__), 'archive_helper')
+
+archive_copy('base/images/favicon.ico', 'app/assets/images/favicon.ico')
+archive_copy('base/images/apple-touch-icon.png', 'app/assets/images/apple-touch-icon.png')
+archive_copy('base/images/apple-touch-icon-72x72.png', 'app/assets/images/apple-touch-icon-72x72.png')
+archive_copy('base/images/apple-touch-icon-114x114.png', 'app/assets/images/apple-touch-icon-114x114.png')
+archive_copy('base/stylesheets/base.css', 'app/assets/stylesheets/base.css')
+archive_copy('base/stylesheets/skeleton.css', 'app/assets/stylesheets/skeleton.css')
+archive_copy('base/stylesheets/layout.css', 'app/assets/stylesheets/layout.css')
+archive_copy('base/javascripts/tabs.js', 'app/assets/javascripts/tabs.js')
