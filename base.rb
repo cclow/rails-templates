@@ -22,11 +22,14 @@ gem 'slim-rails'
 gem 'faker', :group => [:test, :development]
 gem 'factory_girl_rails', :group => [:test, :development]
 gem 'rspec-rails', :group => [:test, :development ]
+gem 'cucumber-rails', :group => [:test, :development ]
 gem 'capybara', :group => [:test, :development]
+gem 'akephalos', :group => [:test, :development]
 gem 'jasmine', :group => [:test, :development ]
 gem 'launchy', :group => [:test, :development]
 gem 'database_cleaner', :group => [:test, :development]
 gem 'guard-rspec', :group => [:test, :development]
+gem 'guard-cucumber', :group => [:test, :development]
 gem 'shoulda-matchers', :group => [:test, :development]
 gem 'rails3-generators', :group => :development
 gem 'awesome_print', :group => :development
@@ -36,6 +39,7 @@ append_file '.gitignore', "vendor/ruby\n"
 run 'bundle install --path vendor && bundle package'
 
 generate 'simple_form:install'
+generate 'cucumber:install'
 generate 'rspec:install'
 inside 'spec' do
   empty_directory 'routing'
@@ -44,6 +48,7 @@ end
 run 'bundle exec jasmine init'
 remove_file 'lib/tasks/jasmine.rake'
 run 'bundle exec guard init rspec'
+run 'bundle exec guard init cucumber'
 
 # add default layout and home page
 archive_copy('base/layout_helper.rb', 'app/helpers/layout_helper.rb')
