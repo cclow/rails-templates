@@ -20,37 +20,40 @@ create_file ".rvmrc", "rvm use #{ruby_gemset}"
 # remove_file 'app/assets/images/rails.png'
 
 run 'cp config/database.yml config/database-sample.yml'
-append_file '.gitignore', "config/database.yml\n"
+archive_copy('base/gitignore', '.gitignore')
+# append_file '.gitignore', "config/database.yml\n"
 
 append_file 'Gemfile', <<-GEMFILE
-  gem 'simple_form'
-  gem 'haml-rails'
-  # gem 'slim-rails'
+gem 'simple_form'
+gem 'haml-rails'
+# gem 'slim-rails'
 
-  group :development do
-    gem 'rails3-generators'
-    gem 'awesome_print'
-  end
+group :development do
+  gem 'rails3-generators'
+  gem 'awesome_print'
+  gem 'pry-rails'   # use pry for rails console
+end
 
-  group :test, :development do
-    gem 'faker'
-    gem 'factory_girl_rails'
-    gem 'rspec-rails'
-    gem 'shoulda-matchers'
-    gem 'capybara'
-    gem 'capybara-webkit'
-    gem 'launchy'
-    gem 'database_cleaner'
-    gem 'guard-bundler'
-    gem 'spork'
-    gem 'guard-spork'
-    gem 'guard-rspec'
-    gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
-    gem 'growl' if RUBY_PLATFORM =~ /darwin/i
-  end
+group :test, :development do
+  gem 'faker'
+  gem 'factory_girl_rails'
+  gem 'rspec-rails'
+  gem 'shoulda-matchers'
+  gem 'capybara'
+  gem 'capybara-webkit'
+  gem 'launchy'
+  gem 'database_cleaner'
+  gem 'guard-bundler'
+  gem 'guard-migrate'
+  gem 'spork'
+  gem 'guard-spork'
+  gem 'guard-rspec'
+  gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
+  gem 'growl' if RUBY_PLATFORM =~ /darwin/i
+end
 GEMFILE
 
-append_file '.gitignore', "vendor/ruby\n"
+# append_file '.gitignore', "vendor/ruby\n"
 run 'bundle install'
 
 generate 'simple_form:install'
@@ -63,17 +66,18 @@ end
 
 run 'spork --bootstrap'
 inject_into_file 'spec/spec_helper.rb', :after => 'Spork.each_run do' do
-%Q{
+%Q<
   load ::Rails.root.join('config','routes.rb')
   Dir[::Rails.root.join('app','**','*.rb')].each {|f| load f}
   Dir[::Rails.root.join('spec','support','**','*.rb')].each {|f| load f}
   FactoryGirl.reload
-}
+>
 end
 
-run 'guard init bundler'
-run 'guard init spork'
-run 'guard init rspec'
+# run 'guard init bundler'
+# run 'guard init spork'
+# run 'guard init rspec'
+archive_copy('base/Guardfile', 'Guardfile')
 
 # add default layout and home page
 archive_copy('base/layout_helper.rb', 'app/helpers/layout_helper.rb')
@@ -96,3 +100,7 @@ RAILS3_GEN
 
 git :add => "."
 git :commit => '-m "Rails 3.1 app with baseline template"'
+
+say "=====================================", :red
+say "Remember to edit spec/spec_helper.rb", :red
+say "=====================================", :red

@@ -4,7 +4,7 @@ log/*.log
 tmp/**/*
 .DS_Store
 TAGS
-*~
+**/*~
 .#*
 db/schema.rb
 db/*.sqlite3
@@ -14,3 +14,4 @@ doc/app
 coverage/*
 *.swp
 public/stylesheets/compiled/*
+vendor/ruby
