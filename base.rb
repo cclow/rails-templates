@@ -25,8 +25,6 @@ archive_copy('base/gitignore', '.gitignore')
 
 append_file 'Gemfile', <<-GEMFILE
 gem 'simple_form'
-gem 'haml-rails'
-# gem 'slim-rails'
 
 group :development do
   gem 'rails3-generators'
@@ -53,7 +51,6 @@ group :test, :development do
 end
 GEMFILE
 
-# append_file '.gitignore', "vendor/ruby\n"
 run 'bundle install'
 
 generate 'simple_form:install'
@@ -74,27 +71,19 @@ inject_into_file 'spec/spec_helper.rb', :after => 'Spork.each_run do' do
 >
 end
 
-# run 'guard init bundler'
-# run 'guard init spork'
-# run 'guard init rspec'
 archive_copy('base/Guardfile', 'Guardfile')
 
 # add default layout and home page
 archive_copy('base/layout_helper.rb', 'app/helpers/layout_helper.rb')
 archive_copy('base/application.html.haml', 'app/views/layouts/application.html.haml')
-# archive_copy('base/application.html.slim', 'app/views/layouts/application.html.slim')
+archive_copy('base/javascript/modernizr-2.06.min.js', 'app/assets/javascripts/modernizr-2.0.6.min.js')
 remove_file 'app/views/layouts/application.html.erb'
 
-# initializer 'slim.rb', <<-SLIM
-# Slim::Engine.set_default_options :pretty => true unless Rails.env == 'production'
-# SLIM
-#
 initializer 'rails3_generators.rb', <<-RAILS3_GEN
 Rails.application.config.generators do |g|
   g.test_framework :rspec, :fixture => true, :views => false
   g.fixture_replacement :factory_girl, :dir => 'spec/factories'
   g.template_engine :haml
-  # g.template_engine :slim
 end
 RAILS3_GEN
 
