@@ -21,10 +21,11 @@ create_file ".rvmrc", "rvm use #{ruby_gemset}"
 
 run 'cp config/database.yml config/database-sample.yml'
 archive_copy('base/gitignore', '.gitignore')
-# append_file '.gitignore', "config/database.yml\n"
 
 append_file 'Gemfile', <<-GEMFILE
 gem 'simple_form'
+gem 'haml-rails'
+gem 'modernizr-rails'
 
 group :development do
   gem 'rails3-generators'
@@ -38,7 +39,7 @@ group :test, :development do
   gem 'rspec-rails'
   gem 'shoulda-matchers'
   gem 'capybara'
-  gem 'capybara-webkit'
+  #  gem 'capybara-webkit'
   gem 'launchy'
   gem 'database_cleaner'
   gem 'guard-bundler'
@@ -76,7 +77,6 @@ archive_copy('base/Guardfile', 'Guardfile')
 # add default layout and home page
 archive_copy('base/layout_helper.rb', 'app/helpers/layout_helper.rb')
 archive_copy('base/application.html.haml', 'app/views/layouts/application.html.haml')
-archive_copy('base/javascript/modernizr-2.06.min.js', 'app/assets/javascripts/modernizr-2.0.6.min.js')
 remove_file 'app/views/layouts/application.html.erb'
 
 initializer 'rails3_generators.rb', <<-RAILS3_GEN
@@ -87,8 +87,8 @@ Rails.application.config.generators do |g|
 end
 RAILS3_GEN
 
-git :add => "."
-git :commit => '-m "Rails 3.1 app with baseline template"'
+# git :add => "."
+# git :commit => '-m "Rails 3.2 app with baseline template"'
 
 say "=====================================", :red
 say "Remember to edit spec/spec_helper.rb", :red

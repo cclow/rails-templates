@@ -14,6 +14,8 @@
 
   %title= @page_title || 'TODO: Default title'
 
+  -# More ideas for your <head> here: h5bp.com/d/head-Tips
+
   %meta{'name' => "description", 'content' => @page_description || 'TODO: Page description'}
 
   -# Mobile viewport optimized: h5bp.com/viewport
@@ -23,33 +25,29 @@
     mathiasbynens.be/notes/touch-icons
   = stylesheet_link_tag 'application'
 
-  -# More ideas for your <head> here: h5bp.com/d/head-Tips
-
   -# All JavaScript at the bottom, except this Modernizr build.
     Modernizr enables HTML5 elements & feature detects for optimal performance.
     Create your own custom Modernizr build: www.modernizr.com/download/
 
-  <script src="js/libs/modernizr-2.0.6.min.js"></script>
+  = javascript_include_tag 'modernizr'
   = csrf_meta_tag
 %body
   %header TODO: Insert header
-  %div{'role' => 'main'} TODO: Main body
+  %div{'role' => 'main'}= yield
   %footer TODO: Insert footer
 
   = javascript_include_tag 'application'
 
-  -# Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.1.min.js"><\/script>')</script>
+  - if Rails.env.production?
 
-  -# Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
-    mathiasbynens.be/notes/async-analytics-snippet
-  <script>
-  var _gaq=[['_setAccount','TODO: UA-XXXXX-X'],['_trackPageview']];
-  (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-  g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-  s.parentNode.insertBefore(g,s)}(document,'script'));
-  </script>
+    -# Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
+      mathiasbynens.be/notes/async-analytics-snippet
+    <script>
+    var _gaq=[['_setAccount','TODO: UA-XXXXX-X'],['_trackPageview']];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
 
   -# Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
     chromium.org/developers/how-tos/chrome-frame-getting-started
