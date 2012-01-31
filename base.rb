@@ -61,6 +61,11 @@ inside 'spec' do
   empty_directory 'support'
   empty_directory 'requests'
 end
+inject_into_file 'spec/spec_helper.rb', :after => "require 'rspec/autorun'" do
+%Q<
+require 'capybara/rspec'
+>
+end
 
 run 'spork --bootstrap'
 inject_into_file 'spec/spec_helper.rb', :after => 'Spork.each_run do' do
@@ -71,7 +76,6 @@ inject_into_file 'spec/spec_helper.rb', :after => 'Spork.each_run do' do
   FactoryGirl.reload
 >
 end
-
 archive_copy('base/Guardfile', 'Guardfile')
 
 # add default layout and home page
