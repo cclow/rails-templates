@@ -5,6 +5,6 @@ def archive_copy(from, to)
   if URI.parse(@archive).scheme
     get "#{@archive}/#{from}", to
   else
-    copy_file "#{@archive}/#{from}", to
+    copy_file "#{@archive}/#{from}", to, :force => true
   end
 end
