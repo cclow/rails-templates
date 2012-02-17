@@ -10,7 +10,7 @@ git :init
 #
 # run "rvm gemset create #{app_name}"
 # run "rvm gemset use #{app_name}"
-# 
+#
 ruby_gemset = `rvm current`.strip
 
 create_file ".rvmrc", "rvm use #{ruby_gemset}"
@@ -66,14 +66,20 @@ inject_into_file 'spec/spec_helper.rb', :after => "require 'rspec/autorun'" do
 require 'capybara/rspec'
 >
 end
+inject_into_file 'spec/spec_helper.rb', :after => "RSpec.configure do |copnfig|" do
+%Q<
+  DatabaseCleaner.strategy = :truncation
+>
+end
 
 run 'spork --bootstrap'
 inject_into_file 'spec/spec_helper.rb', :after => 'Spork.each_run do' do
 %Q<
-  load ::Rails.root.join('config','routes.rb')
+  DatabaseCleaner.clean
   Dir[::Rails.root.join('app','**','*.rb')].each {|f| load f}
   Dir[::Rails.root.join('spec','support','**','*.rb')].each {|f| load f}
   FactoryGirl.reload
+  ::Rails.application.reload_routes!
 >
 end
 archive_copy('base/Guardfile', 'Guardfile')
@@ -90,6 +96,15 @@ Rails.application.config.generators do |g|
   g.template_engine :haml
 end
 RAILS3_GEN
+
+insert_into_file 'config/application.rb', :after => "config.assets.version = '1.0'" do
+%q<
+
+    # autoload libs. this was changed in Rails 3
+    config.autoload_paths += %W(#{config.root}/lib)
+    config.autoload_paths += Dir["#{config.root}/lib/**/"]
+>
+end
 
 # git :add => "."
 # git :commit => '-m "Rails 3.2 app with baseline template"'
