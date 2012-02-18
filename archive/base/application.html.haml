@@ -32,9 +32,11 @@
   = javascript_include_tag 'modernizr'
   = csrf_meta_tag
 %body
-  %header TODO: Insert header
+  %header
+    - if @page_title
+      %h1= @page_title
   %div{'role' => 'main'}= yield
-  %footer TODO: Insert footer
+  %footer
 
   = javascript_include_tag 'application'
 

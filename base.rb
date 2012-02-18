@@ -28,7 +28,6 @@ gem 'haml-rails'
 gem 'modernizr-rails'
 
 group :development do
-  gem 'rails3-generators'
   gem 'awesome_print'
   gem 'pry-rails'   # use pry for rails console
 end
@@ -39,7 +38,6 @@ group :test, :development do
   gem 'rspec-rails'
   gem 'shoulda-matchers'
   gem 'capybara'
-  #  gem 'capybara-webkit'
   gem 'launchy'
   gem 'database_cleaner'
   gem 'guard-bundler'
@@ -66,15 +64,30 @@ inject_into_file 'spec/spec_helper.rb', :after => "require 'rspec/autorun'" do
 require 'capybara/rspec'
 >
 end
-inject_into_file 'spec/spec_helper.rb', :after => "RSpec.configure do |copnfig|" do
-%Q<
-  DatabaseCleaner.strategy = :truncation
+initializer 'database_cleaner.rb' do
+%q<
+RSpec.configure do |config|
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+
+end
 >
 end
 
 run 'spork --bootstrap'
 inject_into_file 'spec/spec_helper.rb', :after => 'Spork.each_run do' do
-%Q<
+%q<
   DatabaseCleaner.clean
   Dir[::Rails.root.join('app','**','*.rb')].each {|f| load f}
   Dir[::Rails.root.join('spec','support','**','*.rb')].each {|f| load f}
@@ -89,13 +102,15 @@ archive_copy('base/layout_helper.rb', 'app/helpers/layout_helper.rb')
 archive_copy('base/application.html.haml', 'app/views/layouts/application.html.haml')
 remove_file 'app/views/layouts/application.html.erb'
 
-initializer 'rails3_generators.rb', <<-RAILS3_GEN
+initializer 'generators.rb' do
+%q<
 Rails.application.config.generators do |g|
-  g.test_framework :rspec, :fixture => true, :views => false
-  g.fixture_replacement :factory_girl, :dir => 'spec/factories'
+  g.test_framework :rspec, fixture: true, views: false
+  g.fixture_replacement :factory_girl, dir: 'spec/factories'
   g.template_engine :haml
 end
-RAILS3_GEN
+>
+end
 
 insert_into_file 'config/application.rb', :after => "config.assets.version = '1.0'" do
 %q<
