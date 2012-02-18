@@ -45,7 +45,7 @@ group :test, :development do
   gem 'spork'
   gem 'guard-spork'
   gem 'guard-rspec'
-  gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
+  gem 'rb-fsevent', require: false if RUBY_PLATFORM =~ /darwin/i
   gem 'growl' if RUBY_PLATFORM =~ /darwin/i
 end
 GEMFILE
@@ -59,34 +59,34 @@ inside 'spec' do
   empty_directory 'support'
   empty_directory 'requests'
 end
-inject_into_file 'spec/spec_helper.rb', :after => "require 'rspec/autorun'" do
-%Q<
+inject_into_file 'spec/spec_helper.rb', after: "require 'rspec/autorun'" do
+%q<
 require 'capybara/rspec'
 >
 end
-initializer 'database_cleaner.rb' do
+insert_into_file 'spec/spec_helper.rb', after: "config.infer_base_class_for_anonymous_controllers = false" do
 %q<
-RSpec.configure do |config|
 
-  config.before(:suite) do
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.clean_with(:truncation)
-  end
+  # TODO remember to remove the conflicting line above
+  config.use_transactional_fixtures = false
 
   config.before(:each) do
+    if example.metadata[:js]
+      DatabaseCleaner.strategy = :truncation
+    else
+      DatabaseCleaner.strategy = :transaction
+    end
     DatabaseCleaner.start
   end
 
   config.after(:each) do
     DatabaseCleaner.clean
   end
-
-end
 >
 end
 
 run 'spork --bootstrap'
-inject_into_file 'spec/spec_helper.rb', :after => 'Spork.each_run do' do
+inject_into_file 'spec/spec_helper.rb', after: 'Spork.each_run do' do
 %q<
   DatabaseCleaner.clean
   Dir[::Rails.root.join('app','**','*.rb')].each {|f| load f}
@@ -112,7 +112,7 @@ end
 >
 end
 
-insert_into_file 'config/application.rb', :after => "config.assets.version = '1.0'" do
+insert_into_file 'config/application.rb', after: "config.assets.version = '1.0'" do
 %q<
 
     # autoload libs. this was changed in Rails 3
