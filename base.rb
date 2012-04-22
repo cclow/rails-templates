@@ -8,12 +8,11 @@ git :init
 # Need to do this before call the template since
 # doing a run "rvm ..." does not change the rvm gemset
 #
-# run "rvm gemset create #{app_name}"
-# run "rvm gemset use #{app_name}"
+# run "rvm use --create #{ruby}@#{app_name}"
 #
 ruby_gemset = `rvm current`.strip
 
-create_file ".rvmrc", "rvm use #{ruby_gemset}"
+run "rvm --rvmrc #{ruby_gemset}"
 
 # remove_file 'doc/README_FOR_APP'
 # remove_file 'public/index.html'
