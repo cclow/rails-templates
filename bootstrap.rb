@@ -7,12 +7,7 @@ git :init
 
 # Need to do this before call the template since
 # doing a run "rvm ..." does not change the rvm gemset
-#
-# run "rvm use --create #{ruby}@#{app_name}"
-#
-ruby_gemset = `rvm current`.strip
-
-run "rvm --rvmrc #{ruby_gemset}"
+create_file '.rvmrc', "rvm use #{`rvm current`.strip}"
 
 run 'cp config/database.yml config/database-sample.yml'
 archive_copy('base/gitignore', '.gitignore')
@@ -23,6 +18,7 @@ gem 'simple_form'
 group :assets do
   gem 'haml-rails'
   gem 'modernizr-rails'
+  gem 'less-rails'
   gem 'twitter-bootstrap-rails'
 end
 group :development do
@@ -43,7 +39,6 @@ group :test, :development do
   gem 'spork'
   gem 'guard-spork'
   gem 'guard-rspec'
-  gem 'turnip'
   gem 'rb-fsevent', require: false if RUBY_PLATFORM =~ /darwin/i
   gem 'growl' if RUBY_PLATFORM =~ /darwin/i
 end
@@ -56,18 +51,12 @@ inside 'spec' do
   empty_directory 'routing'
   empty_directory 'support'
   empty_directory 'requests'
-  # for turnip
   empty_directory 'acceptance'
-  empty_directory 'step_definitions'
 end
-
-append_file '.rspec', '-r turnip
-'
 
 inject_into_file 'spec/spec_helper.rb', after: "require 'rspec/autorun'" do
 %q<
 require 'capybara/rspec'
-require 'turnip/capybara'
 >
 end
 
@@ -93,9 +82,6 @@ insert_into_file 'spec/spec_helper.rb', after: "config.infer_base_class_for_anon
   config.after(:each) do
     DatabaseCleaner.clean
   end
-
-  # Turnip configs
-  Turnip::Config.step_dirs = 'step_definitions'
 >
 end
 
@@ -104,7 +90,6 @@ inject_into_file 'spec/spec_helper.rb', after: 'Spork.each_run do' do
 %q<
   Dir[::Rails.root.join('app','**','*.rb')].each {|f| load f}
   Dir[::Rails.root.join('spec','support','**','*.rb')].each {|f| load f}
-  Turnip::StepLoader.load_steps
   FactoryGirl.reload
   ::Rails.application.reload_routes!
 >
